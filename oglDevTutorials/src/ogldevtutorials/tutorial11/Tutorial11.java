@@ -18,6 +18,7 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import jglm.Mat4;
+import jglm.Vec3;
 import ogldevtutorials.tutorial11.glsl.Program;
 
 /**
@@ -142,9 +143,9 @@ public class Tutorial11 implements GLEventListener {
             0, 1, 2
         };
 
-        ibo = new int[1];        
+        ibo = new int[1];
         gl3.glGenBuffers(1, ibo, 0);
-        
+
         gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
         {
             IntBuffer buffer = GLBuffers.newDirectIntBuffer(indices);
@@ -167,18 +168,19 @@ public class Tutorial11 implements GLEventListener {
 
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
-        scale += 0.01f;
+        scale += 0.001f;
 
         program.bind(gl3);
         {
-            Mat4 gWorld = new Mat4(1f);
+            Pipeline pipeline = new Pipeline();
 
-            gWorld.c0.x = (float) Math.cos(scale);
-            gWorld.c0.z = (float) Math.sin(scale);
-            gWorld.c2.x = -(float) Math.sin(scale);
-            gWorld.c2.z = (float) Math.cos(scale);
+            pipeline.scale(new Vec3((float) Math.sin(scale * 0.1f), (float) Math.sin(scale * 0.1f), (float) Math.sin(scale * 0.1f)));
+            pipeline.worldPos(new Vec3((float) Math.sin(scale), 0f, 0f));
+            pipeline.rotate(new Vec3((float) Math.sin(scale) * 90f, (float) Math.sin(scale) * 90f, (float) Math.sin(scale) * 90f));
+            
+            Mat4 matrix = pipeline.getTrans();
 
-            gl3.glUniformMatrix4fv(program.getgWorldUL(), 1, false, gWorld.toFloatArray(), 0);
+            gl3.glUniformMatrix4fv(program.getgWorldUL(), 1, false, matrix.toFloatArray(), 0);
 
             gl3.glEnableVertexAttribArray(0);
             {
