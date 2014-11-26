@@ -10,6 +10,8 @@ import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.GLBuffers;
 import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
@@ -36,28 +38,14 @@ public class Tutorial05 implements GLEventListener {
 
         frame.setLocation(100, 100);
 
-//        GLWindow window = tutorial04.getGlWindow();
-//        
-//        window.setSize(window.getWidth(), window.getHeight());
-//        
-//        window.setVisible(true);
-        
-//        frame.addWindowListener(new WindowAdapter() {
-//            @Override
-//            public void windowClosing(WindowEvent windowEvent) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-//        frame.addWindowListener(new WindowAdapter() {
-//            public void windowDestroyNotify(WindowEvent arg0) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-        
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                tutorial05.getGlWindow().destroy();
+                frame.dispose();
+                System.exit(0);
+            }
+        });
         frame.setVisible(true);
     }
 
@@ -89,7 +77,7 @@ public class Tutorial05 implements GLEventListener {
         glWindow.setSize(imageWidth, imageHeight);
 
         glWindow.addGLEventListener(this);
-        
+
         FPSAnimator animator = new FPSAnimator(glWindow, 60);
         animator.start();
     }
@@ -105,7 +93,7 @@ public class Tutorial05 implements GLEventListener {
         program = new Program(gl3, "/ogldevtutorials/tutorial05/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
-        
+
         scale = 0f;
     }
 
@@ -136,18 +124,18 @@ public class Tutorial05 implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable glad) {
-        System.out.println("display");
+//        System.out.println("display");
 
         GL3 gl3 = glad.getGL().getGL3();
 
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
         scale += 0.001f;
-        
+        System.out.println("scale " + scale);
         program.bind(gl3);
         {
             gl3.glUniform1f(program.getgScaleUL(), (float) Math.sin(scale));
-            
+
             gl3.glEnableVertexAttribArray(0);
             {
                 gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);

@@ -162,7 +162,7 @@ public class Tutorial13 implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable glad) {
-        System.out.println("display");
+//        System.out.println("display");
 
         GL3 gl3 = glad.getGL().getGL3();
 

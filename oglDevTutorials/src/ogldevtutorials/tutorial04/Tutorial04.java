@@ -6,7 +6,6 @@
 package ogldevtutorials.tutorial04;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
-import com.jogamp.newt.event.awt.AWTWindowAdapter;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.GLBuffers;
 import java.awt.Frame;
@@ -37,29 +36,15 @@ public class Tutorial04 implements GLEventListener {
         frame.setSize(tutorial04.getGlWindow().getWidth(), tutorial04.getGlWindow().getHeight());
 
         frame.setLocation(100, 100);
-
-//        GLWindow window = tutorial04.getGlWindow();
-//        
-//        window.setSize(window.getWidth(), window.getHeight());
-//        
-//        window.setVisible(true);
         
-//        frame.addWindowListener(new WindowAdapter() {
-//            @Override
-//            public void windowClosing(WindowEvent windowEvent) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-//        frame.addWindowListener(new WindowAdapter() {
-//            public void windowDestroyNotify(WindowEvent arg0) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-        
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                tutorial04.getGlWindow().destroy();
+                frame.dispose();
+                System.exit(0);
+            }
+        });        
         frame.setVisible(true);
     }
 
