@@ -7,9 +7,11 @@ package ogldevtutorials.tutorial13;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import javax.media.opengl.GL3;
@@ -20,6 +22,9 @@ import javax.media.opengl.GLProfile;
 import jglm.Mat4;
 import jglm.Vec3;
 import ogldevtutorials.tutorial13.glsl.Program;
+import ogldevtutorials.util.Camera;
+import ogldevtutorials.util.PersProjInfo;
+import ogldevtutorials.util.Pipeline;
 
 /**
  *
@@ -39,26 +44,14 @@ public class Tutorial13 implements GLEventListener {
 
         frame.setLocation(100, 100);
 
-//        GLWindow window = tutorial04.getGlWindow();
-//        
-//        window.setSize(window.getWidth(), window.getHeight());
-//        
-//        window.setVisible(true);
-//        frame.addWindowListener(new WindowAdapter() {
-//            @Override
-//            public void windowClosing(WindowEvent windowEvent) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-//        frame.addWindowListener(new WindowAdapter() {
-//            public void windowDestroyNotify(WindowEvent arg0) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                tutorial13.getGlWindow().destroy();
+                frame.dispose();
+                System.exit(0);
+            }
+        });
         frame.setVisible(true);
     }
 
@@ -70,6 +63,8 @@ public class Tutorial13 implements GLEventListener {
     private int[] ibo;
     private Program program;
     private float scale;
+    private PersProjInfo persProjInfo;
+    private Camera camera;
 
     public Tutorial13() {
 
@@ -92,7 +87,8 @@ public class Tutorial13 implements GLEventListener {
 
         glWindow.addGLEventListener(this);
 
-        FPSAnimator animator = new FPSAnimator(glWindow, 60);
+        Animator animator = new Animator(glWindow);
+        animator.setRunAsFastAsPossible(true);
         animator.start();
     }
 
@@ -111,6 +107,13 @@ public class Tutorial13 implements GLEventListener {
         gl3.glClearColor(0f, 0f, 0f, 0f);
 
         scale = 0f;
+
+        persProjInfo = new PersProjInfo(60f, imageWidth, imageHeight, 1f, 100f);
+
+//        Vec3 cameraPos = new Vec3(0f, 0f, -3f);
+//        Vec3 cameraTarget = new Vec3(0f, 0f, 2f);
+//        Vec3 cameraUp = new Vec3(0f, 1f, 0f);
+        camera = new Camera(imageWidth, imageHeight);
     }
 
     private void createVertexBuffer(GL3 gl3) {
@@ -176,13 +179,12 @@ public class Tutorial13 implements GLEventListener {
 
             pipeline.rotate(new Vec3(0f, scale, 0f));
             pipeline.worldPos(new Vec3(0f, 0f, 3f));
-            Vec3 cameraPosition = new Vec3(0f, 0f, -3f);
-            Vec3 cameraTarget = new Vec3(0f, 0f, 2f);
-            Vec3 cameraUp = new Vec3(0f, 1f, 0f);
-            pipeline.setCamera(cameraPosition, cameraTarget, cameraUp);
-            pipeline.setPerspectiveProj(60f, imageWidth, imageHeight, 1f, 100f);
+            pipeline.setCamera(camera);
+            pipeline.setPerspectiveProj(persProjInfo);
 
-            Mat4 matrix = pipeline.getTrans();
+            Mat4 matrix = pipeline.getWVPTrans();
+
+//            matrix.print("matrix, scale " + scale);
 
             gl3.glUniformMatrix4fv(program.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
 

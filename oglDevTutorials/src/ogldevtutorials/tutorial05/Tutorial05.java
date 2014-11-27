@@ -7,6 +7,7 @@ package ogldevtutorials.tutorial05;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
+import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.GLBuffers;
 import java.awt.Frame;
@@ -56,6 +57,7 @@ public class Tutorial05 implements GLEventListener {
     private int[] vbo;
     private Program program;
     private float scale;
+    private int frame = 0;
 
     public Tutorial05() {
 
@@ -78,7 +80,8 @@ public class Tutorial05 implements GLEventListener {
 
         glWindow.addGLEventListener(this);
 
-        FPSAnimator animator = new FPSAnimator(glWindow, 60);
+        Animator animator = new Animator(glWindow);
+        animator.setRunAsFastAsPossible(true);
         animator.start();
     }
 
@@ -131,7 +134,7 @@ public class Tutorial05 implements GLEventListener {
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
         scale += 0.001f;
-        System.out.println("scale " + scale);
+//        System.out.println("scale " + scale + " frame " + frame++);
         program.bind(gl3);
         {
             gl3.glUniform1f(program.getgScaleUL(), (float) Math.sin(scale));

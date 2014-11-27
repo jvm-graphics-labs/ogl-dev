@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial13;
+package ogldevtutorials.bin;
 
 import jglm.Mat4;
 import jglm.Vec3;
@@ -185,6 +185,8 @@ public class Pipeline {
         public float height;
         public float zNear;
         public float zFar;
+        
+//        public Per
     }
 
     class Camera {
@@ -192,5 +194,12 @@ public class Pipeline {
         public Vec3 pos;
         public Vec3 target;
         public Vec3 up;
+        
+        public Camera(){
+            
+            pos = new Vec3();
+            target = new Vec3();
+            up = new Vec3();
+        }
     }
 }

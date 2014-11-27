@@ -7,9 +7,11 @@ package ogldevtutorials.tutorial08;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
-import com.jogamp.opengl.util.FPSAnimator;
+import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import java.awt.Frame;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import javax.media.opengl.GL3;
 import javax.media.opengl.GLAutoDrawable;
@@ -36,27 +38,15 @@ public class Tutorial08 implements GLEventListener {
         frame.setSize(tutorial08.getGlWindow().getWidth(), tutorial08.getGlWindow().getHeight());
 
         frame.setLocation(100, 100);
-
-//        GLWindow window = tutorial04.getGlWindow();
-//        
-//        window.setSize(window.getWidth(), window.getHeight());
-//        
-//        window.setVisible(true);
-//        frame.addWindowListener(new WindowAdapter() {
-//            @Override
-//            public void windowClosing(WindowEvent windowEvent) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
-//        frame.addWindowListener(new WindowAdapter() {
-//            public void windowDestroyNotify(WindowEvent arg0) {
-//                tutorial04.getGlWindow().destroy();
-//                frame.dispose();
-//                System.exit(0);
-//            }
-//        });
+        
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent windowEvent) {
+                tutorial08.getGlWindow().destroy();
+                frame.dispose();
+                System.exit(0);
+            }
+        });
         frame.setVisible(true);
     }
 
@@ -89,7 +79,8 @@ public class Tutorial08 implements GLEventListener {
 
         glWindow.addGLEventListener(this);
 
-        FPSAnimator animator = new FPSAnimator(glWindow, 60);
+        Animator animator = new Animator(glWindow);
+        animator.setRunAsFastAsPossible(true);
         animator.start();
     }
 
@@ -135,7 +126,7 @@ public class Tutorial08 implements GLEventListener {
 
     @Override
     public void display(GLAutoDrawable glad) {
-        System.out.println("display");
+//        System.out.println("display");
 
         GL3 gl3 = glad.getGL().getGL3();
 
