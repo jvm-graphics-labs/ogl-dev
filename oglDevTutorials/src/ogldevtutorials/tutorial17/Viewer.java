@@ -3,15 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial14;
+package ogldevtutorials.tutorial17;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
-import java.awt.Frame;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import javax.media.opengl.GL3;
@@ -20,62 +17,55 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import jglm.Mat4;
+import jglm.Quat;
 import jglm.Vec3;
-import ogldevtutorials.tutorial14.glsl.Program;
-import ogldevtutorials.util.Camera;
+import ogldevtutorials.tutorial17.glsl.LightingTechnique;
+import ogldevtutorials.tutorial17.util.DirectionalLight;
+import ogldevtutorials.tutorial17.util.KeyListener;
 import ogldevtutorials.util.PersProjInfo;
 import ogldevtutorials.util.Pipeline;
+import ogldevtutorials.util.Texture;
+import ogldevtutorials.util.ViewData;
+import ogldevtutorials.util.ViewPole;
+import ogldevtutorials.util.ViewScale;
 
 /**
  *
  * @author elect
  */
-public class Tutorial14 implements GLEventListener {
+public class Viewer implements GLEventListener {
 
-    public static void main(String[] args) {
-
-        final Tutorial14 tutorial14 = new Tutorial14();
-
-        instance = tutorial14;
-
-        final Frame frame = new Frame("Tutorial 14");
-
-        frame.add(tutorial14.getNewtCanvasAWT());
-
-        frame.setSize(tutorial14.getGlWindow().getWidth(), tutorial14.getGlWindow().getHeight());
-
-        frame.setLocation(100, 100);
-
-        frame.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent windowEvent) {
-                tutorial14.animator.stop();
-                tutorial14.getGlWindow().destroy();
-                frame.dispose();
-                System.exit(0);
-            }
-        });
-        frame.setVisible(true);
-    }
-
-    public static Tutorial14 instance;
     private GLWindow glWindow;
     private NewtCanvasAWT newtCanvasAWT;
     private int imageWidth;
     private int imageHeight;
-    private int[] vbo;
-    private int[] ibo;
-    private Program program;
+    private int[] objects;
+    private LightingTechnique lightingTechnique;
     private float scale;
-    private PersProjInfo persProjInfo;
-    private Camera camera;
     private Pipeline pipeline;
     private Animator animator;
+    private ViewPole viewPole;
+    private Texture texture;
+    private DirectionalLight directionalLight;
 
-    public Tutorial14() {
+    public Viewer() {
 
         imageWidth = 1024;
         imageHeight = 768;
+
+        scale = 0f;
+
+        directionalLight = new DirectionalLight(new Vec3(1f, 1f, 1f), 0.5f);
+
+        Vec3 cameraPos = new Vec3(0f, 0f, -3f);
+        Quat quat = new Quat(0f, 0f, 0f, 1f);
+        viewPole = new ViewPole(new ViewData(cameraPos, quat, 10f), new ViewScale(90f / 250f, 0.2f));
+
+        pipeline = new Pipeline();
+        pipeline.worldPos(new Vec3(0f, 0f, 0f));
+        pipeline.setViewPole(viewPole);
+        PersProjInfo persProjInfo = new PersProjInfo(60f, imageWidth, imageHeight, 1f, 100f);
+        pipeline.setPerspectiveProj(persProjInfo);
 
         initGL();
     }
@@ -93,61 +83,53 @@ public class Tutorial14 implements GLEventListener {
         glWindow.setSize(imageWidth, imageHeight);
 
         glWindow.addGLEventListener(this);
+        glWindow.addMouseListener(viewPole);
+        glWindow.addKeyListener(new KeyListener());
 
         animator = new Animator(glWindow);
-        animator.setRunAsFastAsPossible(true);
         animator.start();
     }
 
     @Override
     public void init(GLAutoDrawable glad) {
-        System.out.println("init");
 
         GL3 gl3 = glad.getGL().getGL3();
 
-        createVertexBuffer(gl3);
+        gl3.glClearColor(0f, 0f, 0f, 0f);
+        gl3.glFrontFace(GL3.GL_CCW);
+        gl3.glCullFace(GL3.GL_BACK);
+        gl3.glEnable(GL3.GL_CULL_FACE);
 
+        objects = new int[Objects.size.ordinal()];
+        createVertexBuffer(gl3);
         createIndexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial14/glsl/shaders/", "VS.glsl", "FS.glsl");
+        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial17/glsl/shaders/", 
+                "lighting_VS.glsl", "lighting_FS.glsl");
 
-        gl3.glClearColor(0f, 0f, 0f, 0f);
+        lightingTechnique.bind(gl3);
+        {
+            gl3.glUniform1i(lightingTechnique.getgSamplerUL(), 0);
+        }
+        lightingTechnique.unbind(gl3);
 
-        scale = 0f;
+        texture = new Texture(GL3.GL_TEXTURE_2D, "test.png");
 
-        persProjInfo = new PersProjInfo(60f, imageWidth, imageHeight, 1f, 100f);
-
-//        Vec3 cameraPos = new Vec3(0f, 0f, -3f);
-//        Vec3 cameraTarget = new Vec3(0f, 0f, 2f);
-//        Vec3 cameraUp = new Vec3(0f, 1f, 0f);
-        camera = new Camera(imageWidth, imageHeight);
-        glWindow.addMouseListener(camera);
-
-        pipeline = new Pipeline();
-
-        pipeline.worldPos(new Vec3(0f, 0f, 0f));
-        pipeline.setCamera(camera);
-        pipeline.setPerspectiveProj(persProjInfo);
+        texture.load(gl3);
     }
 
     private void createVertexBuffer(GL3 gl3) {
 
         float[] vertices = new float[]{
-            -1f, -1f, 0.5773f,
-            0f, -1f, -1.15475f,
-            1f, -1f, 0.5773f,
-            0f, 1f, 0f
+            -1f, -1f, 0.5773f, 0f, 0f,
+            0f, -1f, -1.15475f, 0.5f, 0f,
+            1f, -1f, 0.5773f, 1f, 0f,
+            0f, 1f, 0f, 0.5f, 1f
         };
-//        float[] vertices = new float[]{
-//            -1f, -1f, -1f,
-//            0f, -1f, -1f,
-//            1f, 1f, -1f
-//        };
 
-        vbo = new int[1];
-        gl3.glGenBuffers(1, vbo, 0);
+        gl3.glGenBuffers(1, objects, Objects.vbo.ordinal());
 
-        gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);
+        gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, objects[Objects.vbo.ordinal()]);
         {
             FloatBuffer buffer = GLBuffers.newDirectFloatBuffer(vertices);
 
@@ -162,16 +144,12 @@ public class Tutorial14 implements GLEventListener {
             0, 3, 1,
             1, 3, 2,
             2, 3, 0,
-            0, 1, 2
+            1, 2, 0
         };
-//        int[] indices = new int[]{
-//            0, 1, 2
-//        };
 
-        ibo = new int[1];
-        gl3.glGenBuffers(1, ibo, 0);
+        gl3.glGenBuffers(1, objects, Objects.ibo.ordinal());
 
-        gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
+        gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, objects[Objects.ibo.ordinal()]);
         {
             IntBuffer buffer = GLBuffers.newDirectIntBuffer(indices);
 
@@ -194,42 +172,48 @@ public class Tutorial14 implements GLEventListener {
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
         scale += 0.1f;
-        program.bind(gl3);
+        lightingTechnique.bind(gl3);
         {
-//            Pipeline pipeline = new Pipeline();
-
             pipeline.rotate(new Vec3(0f, scale, 0f));
-//            pipeline.worldPos(new Vec3(0f, 0f, 3f));
-//            pipeline.setCamera(camera);
-//            pipeline.setPerspectiveProj(persProjInfo);
 
             Mat4 matrix = pipeline.getWVPTrans();
 
-//            matrix.print("matrix, scale " + scale);
-            gl3.glUniformMatrix4fv(program.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
+            gl3.glUniformMatrix4fv(lightingTechnique.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
+            
+            lightingTechnique.setDirectionalLight(gl3, directionalLight);
 
             gl3.glEnableVertexAttribArray(0);
+            gl3.glEnableVertexAttribArray(1);
             {
-                gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, vbo[0]);
+                gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, objects[Objects.vbo.ordinal()]);
                 {
-                    gl3.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, 0, 0);
+                    gl3.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, 5 * 4, 0);
+                    gl3.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, 5 * 4, 3 * 4);
 
-                    gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, ibo[0]);
+                    gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, objects[Objects.ibo.ordinal()]);
                     {
-                        gl3.glDrawElements(GL3.GL_TRIANGLES, 12, GL3.GL_UNSIGNED_INT, 0);
+                        texture.bind(gl3, GL3.GL_TEXTURE0);
+                        {
+                            gl3.glDrawElements(GL3.GL_TRIANGLES, 12, GL3.GL_UNSIGNED_INT, 0);
+                        }
+                        texture.unbind(gl3, GL3.GL_TEXTURE0);
                     }
                     gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, 0);
                 }
                 gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
             }
             gl3.glDisableVertexAttribArray(0);
+            gl3.glDisableVertexAttribArray(1);
         }
-        program.unbind(gl3);
+        lightingTechnique.unbind(gl3);
     }
 
     @Override
     public void reshape(GLAutoDrawable glad, int i, int i1, int i2, int i3) {
         System.out.println("reshape (" + i + ", " + i1 + ") (" + i2 + ", " + i3 + ")");
+
+        imageWidth = i2;
+        imageHeight = i3;
 
         GL3 gl3 = glad.getGL().getGL3();
 
@@ -246,5 +230,16 @@ public class Tutorial14 implements GLEventListener {
 
     public Animator getAnimator() {
         return animator;
+    }
+
+    public DirectionalLight getDirectionalLight() {
+        return directionalLight;
+    }
+
+    private enum Objects {
+
+        vbo,
+        ibo,
+        size
     }
 }

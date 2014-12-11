@@ -5,6 +5,7 @@
  */
 package ogldevtutorials.util;
 
+import jglm.Jglm;
 import jglm.Mat4;
 import jglm.Vec3;
 import jglm.Vec4;
@@ -20,6 +21,7 @@ public class Pipeline {
     private Vec3 rotateInfo;
     private PersProjInfo persProjInfo;
     private Camera camera;
+    private ViewPole viewPole;
 
     public Pipeline() {
 
@@ -73,20 +75,38 @@ public class Pipeline {
 //        wTransformation.print("wTransformation");
         Mat4 vpTransformation = getVPTrans();
 //        vpTransformation.print("vpTransformation");
+
+//        Vec4 modelSpaceOrigin = new Vec4(0f, 0f, 0f, 1f);
+//        modelSpaceOrigin.print("modelSpaceOrigin");
+//        Vec4 modelSpaceOriginInWorldSpace = wTransformation.mult(modelSpaceOrigin);
+//        modelSpaceOriginInWorldSpace.print("modelSpaceOriginInWorldSpace");
+//        Vec4 modelSpaceOriginInCameraSpace = camera.calcMatrix().mult(modelSpaceOriginInWorldSpace);
+//        modelSpaceOriginInCameraSpace.print("modelSpaceOriginInCameraSpace");
+
         return vpTransformation.mult(wTransformation);
     }
 
     private Mat4 getVPTrans() {
 
-        Mat4 cameraTranslationTrans, cameraRotateTrans, persProjTrans;
+//        Mat4 cameraTranslationTrans, cameraRotateTrans, persProjTrans;
+//
+//        cameraTranslationTrans = initTranslationTransform(camera.pos.negated());
+////        cameraTranslationTrans.print("cameraTranslationTrans");
+//        cameraRotateTrans = initCameraTransform(camera.target, camera.up);
+////        cameraRotateTrans.print("cameraRotateTrans");
+//        persProjTrans = initPerspectiveProj();
+////        persProjTrans.print("persProjTrans");
+//        return persProjTrans.mult(cameraRotateTrans.mult(cameraTranslationTrans));
+        
+        Mat4 cameraTrans = camera==null? viewPole.calcMatrix() : camera.calcMatrix();
 
-        cameraTranslationTrans = initTranslationTransform(camera.pos.negated());
-//        cameraTranslationTrans.print("cameraTranslationTrans");
-        cameraRotateTrans = initCameraTransform(camera.target, camera.up);
-//        cameraRotateTrans.print("cameraRotateTrans");
-        persProjTrans = initPerspectiveProj();
+//        Mat4 persProjTrans = initPerspectiveProj();
+        Mat4 persProjTrans = Jglm.perspective(persProjInfo.fov, persProjInfo.width / persProjInfo.height,
+                persProjInfo.zNear, persProjInfo.zFar);
 //        persProjTrans.print("persProjTrans");
-        return persProjTrans.mult(cameraRotateTrans.mult(cameraTranslationTrans));
+//        initPerspectiveProj().print("initPerspectiveProj()");
+
+        return persProjTrans.mult(cameraTrans);
     }
 
     private Mat4 initScaleTransform() {
@@ -205,5 +225,9 @@ public class Pipeline {
 
     public void setCamera(Camera camera) {
         this.camera = camera;
+    }
+
+    public void setViewPole(ViewPole viewPole) {
+        this.viewPole = viewPole;
     }
 }

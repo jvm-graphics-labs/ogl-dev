@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial14;
+package ogldevtutorials.tutorial15;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -20,37 +20,41 @@ import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
 import jglm.Mat4;
+import jglm.Quat;
 import jglm.Vec3;
-import ogldevtutorials.tutorial14.glsl.Program;
+import ogldevtutorials.tutorial15.glsl.Program;
 import ogldevtutorials.util.Camera;
 import ogldevtutorials.util.PersProjInfo;
 import ogldevtutorials.util.Pipeline;
+import ogldevtutorials.util.ViewData;
+import ogldevtutorials.util.ViewPole;
+import ogldevtutorials.util.ViewScale;
 
 /**
  *
  * @author elect
  */
-public class Tutorial14 implements GLEventListener {
+public class Tutorial15 implements GLEventListener {
 
     public static void main(String[] args) {
 
-        final Tutorial14 tutorial14 = new Tutorial14();
+        final Tutorial15 tutorial15 = new Tutorial15();
 
-        instance = tutorial14;
+        instance = tutorial15;
 
-        final Frame frame = new Frame("Tutorial 14");
+        final Frame frame = new Frame("Tutorial 15");
 
-        frame.add(tutorial14.getNewtCanvasAWT());
+        frame.add(tutorial15.getNewtCanvasAWT());
 
-        frame.setSize(tutorial14.getGlWindow().getWidth(), tutorial14.getGlWindow().getHeight());
+        frame.setSize(tutorial15.getGlWindow().getWidth(), tutorial15.getGlWindow().getHeight());
 
         frame.setLocation(100, 100);
 
         frame.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent windowEvent) {
-                tutorial14.animator.stop();
-                tutorial14.getGlWindow().destroy();
+                tutorial15.animator.stop();
+                tutorial15.getGlWindow().destroy();
                 frame.dispose();
                 System.exit(0);
             }
@@ -58,7 +62,7 @@ public class Tutorial14 implements GLEventListener {
         frame.setVisible(true);
     }
 
-    public static Tutorial14 instance;
+    public static Tutorial15 instance;
     private GLWindow glWindow;
     private NewtCanvasAWT newtCanvasAWT;
     private int imageWidth;
@@ -71,8 +75,9 @@ public class Tutorial14 implements GLEventListener {
     private Camera camera;
     private Pipeline pipeline;
     private Animator animator;
+    private ViewPole viewPole;
 
-    public Tutorial14() {
+    public Tutorial15() {
 
         imageWidth = 1024;
         imageHeight = 768;
@@ -97,6 +102,11 @@ public class Tutorial14 implements GLEventListener {
         animator = new Animator(glWindow);
         animator.setRunAsFastAsPossible(true);
         animator.start();
+
+        Vec3 cameraPos = new Vec3(0f, 0f, -3f);
+        Quat quat = new Quat(0f, 0f, 0f, 1f);
+
+        viewPole = new ViewPole(new ViewData(cameraPos, quat, 10f), new ViewScale(90f/250f, 0.2f));
     }
 
     @Override
@@ -109,7 +119,7 @@ public class Tutorial14 implements GLEventListener {
 
         createIndexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial14/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tutorial15/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
 
@@ -117,16 +127,15 @@ public class Tutorial14 implements GLEventListener {
 
         persProjInfo = new PersProjInfo(60f, imageWidth, imageHeight, 1f, 100f);
 
-//        Vec3 cameraPos = new Vec3(0f, 0f, -3f);
-//        Vec3 cameraTarget = new Vec3(0f, 0f, 2f);
-//        Vec3 cameraUp = new Vec3(0f, 1f, 0f);
         camera = new Camera(imageWidth, imageHeight);
-        glWindow.addMouseListener(camera);
+//        glWindow.addMouseListener(camera);
+        glWindow.addMouseListener(viewPole);
 
         pipeline = new Pipeline();
 
         pipeline.worldPos(new Vec3(0f, 0f, 0f));
-        pipeline.setCamera(camera);
+//        pipeline.setCamera(camera);
+        pipeline.setViewPole(viewPole);
         pipeline.setPerspectiveProj(persProjInfo);
     }
 
@@ -138,11 +147,6 @@ public class Tutorial14 implements GLEventListener {
             1f, -1f, 0.5773f,
             0f, 1f, 0f
         };
-//        float[] vertices = new float[]{
-//            -1f, -1f, -1f,
-//            0f, -1f, -1f,
-//            1f, 1f, -1f
-//        };
 
         vbo = new int[1];
         gl3.glGenBuffers(1, vbo, 0);
@@ -164,9 +168,6 @@ public class Tutorial14 implements GLEventListener {
             2, 3, 0,
             0, 1, 2
         };
-//        int[] indices = new int[]{
-//            0, 1, 2
-//        };
 
         ibo = new int[1];
         gl3.glGenBuffers(1, ibo, 0);
