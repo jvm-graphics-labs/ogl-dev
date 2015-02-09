@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial18.util;
+package ogldevtutorials.tutorial19.util;
 
 import jglm.Vec3;
 

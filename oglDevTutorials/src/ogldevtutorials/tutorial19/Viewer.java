@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial18;
+package ogldevtutorials.tutorial19;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -19,9 +19,9 @@ import javax.media.opengl.GLProfile;
 import jglm.Mat4;
 import jglm.Quat;
 import jglm.Vec3;
-import ogldevtutorials.tutorial18.glsl.LightingTechnique;
-import ogldevtutorials.tutorial18.util.DirectionalLight;
-import ogldevtutorials.tutorial18.util.KeyListener;
+import ogldevtutorials.tutorial19.glsl.LightingTechnique;
+import ogldevtutorials.tutorial19.util.DirectionalLight;
+import ogldevtutorials.tutorial19.util.KeyListener;
 import ogldevtutorials.util.PersProjInfo;
 import ogldevtutorials.util.Pipeline;
 import ogldevtutorials.util.Texture;
@@ -48,6 +48,7 @@ public class Viewer implements GLEventListener {
     private Texture texture;
     private DirectionalLight directionalLight;
     private int[] indices;
+    private Vec3 cameraPos;
 
     public Viewer() {
 
@@ -58,9 +59,10 @@ public class Viewer implements GLEventListener {
 
         directionalLight = new DirectionalLight(new Vec3(1f, 1f, 1f), 0.5f, new Vec3(1f, 0f, 0f), .75f);
 
-        Vec3 targetPos = new Vec3(0f, 0f, 1f);
+        Vec3 targetPos = new Vec3(0f, 0f, 0f);
         Quat quat = new Quat(0f, 0f, 0f, 1f);
-        viewPole = new ViewPole(new ViewData(targetPos, quat, 10f), new ViewScale(90f / 250f, 0.2f));
+        viewPole = new ViewPole(new ViewData(targetPos, quat, 3f), new ViewScale(90f / 250f, 0.2f));
+        cameraPos = new Vec3(0f, 0f, 3f);
 
         pipeline = new Pipeline();
         pipeline.worldPos(new Vec3(0f, 0f, 0f));
@@ -106,7 +108,7 @@ public class Viewer implements GLEventListener {
         createIndexBuffer(gl3);
         createVertexBuffer(gl3);
 
-        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial18/glsl/shaders/",
+        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial19/glsl/shaders/",
                 "lighting_VS.glsl", "lighting_FS.glsl");
 
         lightingTechnique.bind(gl3);
@@ -221,7 +223,7 @@ public class Viewer implements GLEventListener {
 
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
-        scale += 1f;
+        scale += 0.1f;
         lightingTechnique.bind(gl3);
         {
             pipeline.rotate(new Vec3(0f, scale, 0f));
@@ -233,6 +235,10 @@ public class Viewer implements GLEventListener {
             Mat4 worldTransformation = pipeline.getWorldTrans();
             gl3.glUniformMatrix4fv(lightingTechnique.getgWorldUL(), 1, false, worldTransformation.toFloatArray(), 0);
             lightingTechnique.setDirectionalLight(gl3, directionalLight);
+            
+            gl3.glUniform3f(lightingTechnique.getgEyeWorldPosUL(), cameraPos.x, cameraPos.y, cameraPos.z);
+            gl3.glUniform1f(lightingTechnique.getgMatSpecularIntensityUL(), 1f);            
+            gl3.glUniform1f(lightingTechnique.getgSpecularPowerUL(), 32f);            
 
             gl3.glEnableVertexAttribArray(0);
             gl3.glEnableVertexAttribArray(1);

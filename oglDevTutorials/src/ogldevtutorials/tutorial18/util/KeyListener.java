@@ -34,6 +34,18 @@ public class KeyListener implements com.jogamp.newt.event.KeyListener{
                 ambientIntensity -= step;
                 Tutorial18.instance.getDirectionalLight().setAmbientIntensity(ambientIntensity);
                 break;
+                
+            case KeyEvent.VK_Z:
+                float diffuseIntensity = Tutorial18.instance.getDirectionalLight().getDiffuseIntensity();
+                diffuseIntensity += step;
+                Tutorial18.instance.getDirectionalLight().setDiffuseIntensity(diffuseIntensity);
+                break;
+                
+            case KeyEvent.VK_X:
+                diffuseIntensity = Tutorial18.instance.getDirectionalLight().getDiffuseIntensity();
+                diffuseIntensity -= step;
+                Tutorial18.instance.getDirectionalLight().setDiffuseIntensity(diffuseIntensity);
+                break;
         }
     }
 
