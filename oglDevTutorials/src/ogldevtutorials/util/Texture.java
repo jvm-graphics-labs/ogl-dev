@@ -45,7 +45,6 @@ public class Texture {
             if (i > 0) {
                 extension = fileName.substring(i + 1);
             }
-
             TextureData textureData = TextureIO.newTextureData(gl3.getGLProfile(), file, false, extension);
 
             Buffer buffer = textureData.getBuffer();

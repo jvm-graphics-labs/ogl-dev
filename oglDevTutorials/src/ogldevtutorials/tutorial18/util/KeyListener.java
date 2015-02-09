@@ -3,10 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tutorial17.util;
+package ogldevtutorials.tutorial18.util;
 
 import com.jogamp.newt.event.KeyEvent;
-import ogldevtutorials.tutorial17.Tutorial17;
+import ogldevtutorials.tutorial18.Tutorial18;
 
 
 /**
@@ -24,15 +24,15 @@ public class KeyListener implements com.jogamp.newt.event.KeyListener{
         switch(ke.getKeyCode()){
             
             case KeyEvent.VK_A:
-                float ambientIntensity = Tutorial17.instance.getDirectionalLight().getAmbientIntensity();
+                float ambientIntensity = Tutorial18.instance.getDirectionalLight().getAmbientIntensity();
                 ambientIntensity += step;
-                Tutorial17.instance.getDirectionalLight().setAmbientIntensity(ambientIntensity);
+                Tutorial18.instance.getDirectionalLight().setAmbientIntensity(ambientIntensity);
                 break;
             
             case KeyEvent.VK_S:
-                ambientIntensity = Tutorial17.instance.getDirectionalLight().getAmbientIntensity();
+                ambientIntensity = Tutorial18.instance.getDirectionalLight().getAmbientIntensity();
                 ambientIntensity -= step;
-                Tutorial17.instance.getDirectionalLight().setAmbientIntensity(ambientIntensity);
+                Tutorial18.instance.getDirectionalLight().setAmbientIntensity(ambientIntensity);
                 break;
         }
     }
