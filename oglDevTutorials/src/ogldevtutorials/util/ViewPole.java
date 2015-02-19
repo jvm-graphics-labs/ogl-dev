@@ -120,6 +120,8 @@ public class ViewPole implements MouseListener {
 
             onDragTranslate(me);
         }
+//        Vec4 cameraPositionInWorldSpace = calcMatrix().inverse().mult(new Vec4(0f, 0f, 0f, 1f));
+//        cameraPositionInWorldSpace.print("cameraPositionInWorldSpace");
     }
 
     private void onDragRotate(MouseEvent me) {
