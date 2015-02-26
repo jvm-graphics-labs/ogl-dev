@@ -195,7 +195,7 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
     
     public void setSpotLights(GL3 gl3, Light.SpotLight[] lights) {
 
-        gl3.glUniform1f(gNumSpotLightsUL, lights.length);
+        gl3.glUniform1i(gNumSpotLightsUL, lights.length);
 
         for (int i = 0; i < lights.length; i++) {
             

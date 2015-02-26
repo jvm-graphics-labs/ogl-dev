@@ -117,12 +117,12 @@ void main()
                                                                                             
     for (int i = 0 ; i < gNumPointLights ; i++) {                                           
         TotalLight += CalcPointLight(gPointLights[i], Normal);                              
-    }                                                                                       
-                                                                                            
-    for (int i = 0 ; i < gNumSpotLights ; i++) {                            
+    }                                                                                               
+                                                                           
+    for (int i = 0 ; i < gNumSpotLights ; i++) {            
+                
         TotalLight += CalcSpotLight(gSpotLights[i], Normal);
-    }                                                                                       
+    }                            
                                                                                             
-    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;                             
-
+    FragColor = texture2D(gSampler, TexCoord0.xy) * TotalLight;
 }
