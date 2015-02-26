@@ -17,7 +17,6 @@ import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLCapabilities;
 import javax.media.opengl.GLEventListener;
 import javax.media.opengl.GLProfile;
-import ogldevtutorials.tut04_shaders.glsl.Program;
 
 /**
  *
@@ -85,7 +84,7 @@ public class Tutorial04 implements GLEventListener {
 
         createVertexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial04/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tut04_shaders/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
     }

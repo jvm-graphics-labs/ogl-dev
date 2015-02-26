@@ -106,7 +106,7 @@ public class Viewer implements GLEventListener {
         createIndexBuffer(gl3);
         createVertexBuffer(gl3);
 
-        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial18/glsl/shaders/",
+        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tut18_diffuseLighting/glsl/shaders/",
                 "lighting_VS.glsl", "lighting_FS.glsl");
 
         lightingTechnique.bind(gl3);

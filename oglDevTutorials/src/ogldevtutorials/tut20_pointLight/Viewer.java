@@ -110,7 +110,7 @@ public class Viewer implements GLEventListener {
 
         createVertexBuffer(gl3);
 
-        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial20/glsl/shaders/",
+        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tut20_pointLight/glsl/shaders/",
                 "lighting_VS.glsl", "lighting_FS.glsl");
 
         lightingTechnique.bind(gl3);

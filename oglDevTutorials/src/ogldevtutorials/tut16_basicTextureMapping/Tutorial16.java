@@ -135,7 +135,7 @@ public class Tutorial16 implements GLEventListener {
         createVertexBuffer(gl3);
         createIndexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial16/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tut16_basicTextureMapping/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glUniform1i(program.getgSamplerUL(), 0);
 

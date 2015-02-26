@@ -93,7 +93,7 @@ public class Tutorial06 implements GLEventListener {
 
         createVertexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial06/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tut06_translationTransformation/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
         

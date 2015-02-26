@@ -109,7 +109,7 @@ public class Tutorial14 implements GLEventListener {
 
         createIndexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial14/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tut14_cameraControl1/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
 

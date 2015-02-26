@@ -100,7 +100,7 @@ public class Tutorial12 implements GLEventListener {
 
         createIndexBuffer(gl3);
 
-        program = new Program(gl3, "/ogldevtutorials/tutorial12/glsl/shaders/", "VS.glsl", "FS.glsl");
+        program = new Program(gl3, "/ogldevtutorials/tut12_perspectiveProjection/glsl/shaders/", "VS.glsl", "FS.glsl");
 
         gl3.glClearColor(0f, 0f, 0f, 0f);
 

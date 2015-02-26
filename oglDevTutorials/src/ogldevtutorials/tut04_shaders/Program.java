@@ -3,14 +3,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-
-package ogldevtutorials.tut04_shaders.glsl;
+package ogldevtutorials.tut04_shaders;
 
 import javax.media.opengl.GL3;
 
 /**
  *
- * @author elect
+ * @author gbarbieri
  */
 public class Program extends glsl.GLSLProgramObject{
 

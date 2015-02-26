@@ -5,7 +5,6 @@
  */
 package ogldevtutorials.tut21_spotLight;
 
-import ogldevtutorials.tut20_pointLight.util.Light;
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.Animator;
@@ -22,8 +21,11 @@ import jglm.Quat;
 import jglm.Vec2i;
 import jglm.Vec3;
 import jglm.Vec4;
-import ogldevtutorials.tut20_pointLight.glsl.LightingTechnique;
-import ogldevtutorials.tut20_pointLight.util.KeyListener;
+import ogldevtutorials.tut21_spotLight.glsl.LightingTechnique;
+import ogldevtutorials.tut21_spotLight.util.KeyListener;
+import ogldevtutorials.tut21_spotLight.util.Light.DirectionalLight;
+import ogldevtutorials.tut21_spotLight.util.Light.PointLight;
+import ogldevtutorials.tut21_spotLight.util.Light.SpotLight;
 import ogldevtutorials.util.PersProjInfo;
 import ogldevtutorials.util.Pipeline;
 import ogldevtutorials.util.Texture;
@@ -43,7 +45,7 @@ public class Viewer implements GLEventListener {
     private int imageHeight;
     private int[] objects;
     private LightingTechnique lightingTechnique;
-    private Light.DirectionalLight directionalLight;
+    private DirectionalLight directionalLight;
     private float scale;
     private Pipeline pipeline;
     private Animator animator;
@@ -51,6 +53,7 @@ public class Viewer implements GLEventListener {
     private Texture texture;
     private Vec4 cameraPos;
     private Vec2i field;
+    private Vec3 targetPos;
 
     public Viewer() {
 
@@ -59,11 +62,12 @@ public class Viewer implements GLEventListener {
 
         scale = 0f;
 
-        field = new Vec2i(20, 10);
+        field = new Vec2i(10, 20);
 
-        directionalLight = new Light.DirectionalLight(new Vec3(1f, 1f, 1f), 0f, .01f, new Vec3(1f, -1f, 0f));
+        directionalLight = new DirectionalLight(new Vec3(1f, 1f, 1f), 0f, .01f, new Vec3(1f, -1f, 0f));
 
-        Vec3 targetPos = new Vec3(field.y / 2, 0f, field.x / 2);
+//        targetPos = new Vec3(field.y / 2, 0f, field.x / 2);
+        targetPos = new Vec3(0f, 0f, 0f);
 //        Quat quat = new Quat(0f, 0f, 0f, 1f);
         Quat quat = Jglm.angleAxis(90, new Vec3(1f, 0f, 0f));
         viewPole = new ViewPole(new ViewData(targetPos, quat, 20f), new ViewScale(90f / 250f, 0.2f));
@@ -110,7 +114,7 @@ public class Viewer implements GLEventListener {
 
         createVertexBuffer(gl3);
 
-        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tutorial20/glsl/shaders/",
+        lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tut21_spotLight/glsl/shaders/",
                 "lighting_VS.glsl", "lighting_FS.glsl");
 
         lightingTechnique.bind(gl3);
@@ -130,11 +134,11 @@ public class Viewer implements GLEventListener {
 
         float[] vertices = new float[]{
             0f, 0f, 0f, 0f, 0f, normal.x, normal.y, normal.z,
-            0f, 0f, field.x, 0f, 1f, normal.x, normal.y, normal.z,
-            field.y, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
-            field.y, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
-            0f, 0f, field.x, 0f, 1f, normal.x, normal.y, normal.z,
-            field.y, 0f, field.x, 1f, 1f, normal.x, normal.y, normal.z
+            0f, 0f, field.y, 0f, 1f, normal.x, normal.y, normal.z,
+            field.x, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
+            field.x, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
+            0f, 0f, field.y, 0f, 1f, normal.x, normal.y, normal.z,
+            field.x, 0f, field.y, 1f, 1f, normal.x, normal.y, normal.z
         };
         gl3.glGenBuffers(1, objects, Objects.vbo.ordinal());
 
@@ -161,19 +165,37 @@ public class Viewer implements GLEventListener {
         gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
 
         scale += 0.0057f;
+        
+        cameraPos = viewPole.calcMatrix().inverse().mult(new Vec4(0f, 0f, 0f, 1f));
+//        cameraPos.print("cameraPos");
 
         lightingTechnique.bind(gl3);
         {
-            Light.PointLight[] pl = new Light.PointLight[]{new Light.PointLight(), new Light.PointLight()};
-            pl[0].diffuseIntensity = .5f;
+            PointLight[] pl = new PointLight[]{new PointLight(), new PointLight()};
+            pl[0].diffuseIntensity = .25f;
             pl[0].color = new Vec3(1f, .5f, 0f);
-            pl[0].position = new Vec3(3f, 1f, (float) (field.x * (Math.cos(scale) + 1f) / 2f));
+            pl[0].position = new Vec3(3f, 1f, (float) (field.y * (Math.cos(scale) + 1f) / 2f));
             pl[0].attenuation.linear = .1f;
-            pl[1].diffuseIntensity = .5f;
+            pl[1].diffuseIntensity = .25f;
             pl[1].color = new Vec3(0f, .5f, 1f);
-            pl[1].position = new Vec3(7f, 1f, (float) (field.x * (Math.sin(scale) + 1f) / 2f));
+            pl[1].position = new Vec3(7f, 1f, (float) (field.y * (Math.sin(scale) + 1f) / 2f));
             pl[1].attenuation.linear = .1f;
             lightingTechnique.setPointLights(gl3, pl);
+            
+            SpotLight[] sl = new SpotLight[]{new SpotLight(), new SpotLight()};
+            sl[0].diffuseIntensity = .9f;
+            sl[0].color = new Vec3(0f, 1f, 1f);
+            sl[0].position = new Vec3(cameraPos);
+            sl[0].direction = targetPos;
+            sl[0].attenuation.linear = .1f;
+            sl[0].cutoff = 10f;
+            sl[1].diffuseIntensity = .9f;
+            sl[1].color = new Vec3(1f, 1f, 1f);
+            sl[1].position = new Vec3(5f, 3f, 10f);
+            sl[1].direction = new Vec3(0f, -1f, 0f);
+            sl[1].attenuation.linear = .1f;
+            sl[1].cutoff = 20f;
+            lightingTechnique.setSpotLights(gl3, sl);
 
             Mat4 matrix = pipeline.getWVPTrans();
             gl3.glUniformMatrix4fv(lightingTechnique.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
@@ -182,9 +204,7 @@ public class Viewer implements GLEventListener {
             gl3.glUniformMatrix4fv(lightingTechnique.getgWorldUL(), 1, false, worldTransformation.toFloatArray(), 0);
 
             lightingTechnique.setDirectionalLight(gl3, directionalLight);
-
-            cameraPos = viewPole.calcMatrix().inverse().mult(new Vec4(0f, 0f, 0f, 1f));
-//            cameraPos.print("cameraPosition");
+            
             gl3.glUniform3f(lightingTechnique.getgEyeWorldPosUL(), cameraPos.x, cameraPos.y, cameraPos.z);
             gl3.glUniform1f(lightingTechnique.getgMatSpecularIntensityUL(), 0f);
             gl3.glUniform1f(lightingTechnique.getgSpecularPowerUL(), 0f);
@@ -202,17 +222,7 @@ public class Viewer implements GLEventListener {
 
                     texture.bind(gl3, GL3.GL_TEXTURE0);
                     {
-//                        int[] query = new int[1];
-//                        int[] samples = new int[1];
-//                        gl3.glGenQueries(1, query, 0);
-//                        gl3.glBeginQuery(GL3.GL_SAMPLES_PASSED, query[0]);
-
                         gl3.glDrawArrays(GL3.GL_TRIANGLES, 0, 6);
-
-//                        gl3.glEndQuery(GL3.GL_SAMPLES_PASSED);
-//                        gl3.glGetQueryObjectiv(query[0], GL3.GL_QUERY_RESULT_AVAILABLE, samples, 0);
-//                        System.out.println("samples " + samples[0]);
-//                        gl3.glDeleteQueries(1, query, 0);
                     }
                     texture.unbind(gl3, GL3.GL_TEXTURE0);
                 }
@@ -249,7 +259,7 @@ public class Viewer implements GLEventListener {
         return animator;
     }
 
-    public Light.DirectionalLight getDirectionalLight() {
+    public DirectionalLight getDirectionalLight() {
         return directionalLight;
     }
 

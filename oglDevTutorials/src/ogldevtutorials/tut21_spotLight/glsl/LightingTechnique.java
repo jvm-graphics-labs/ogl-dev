@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tut20_pointLight.glsl;
+package ogldevtutorials.tut21_spotLight.glsl;
 
 import javax.media.opengl.GL3;
 import jglm.Vec3;
-import ogldevtutorials.tut20_pointLight.util.Light;
+import ogldevtutorials.tut21_spotLight.util.Light;
 
 /**
  *
@@ -26,7 +26,9 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
     private int gMatSpecularIntensityUL;
     private int gSpecularPowerUL;
     private int gNumPointLightsUL;
-    private PointLightsUL[] m_pointLightsUL;
+    private int gNumSpotLightsUL;
+    private PointLightUL[] m_pointLightsUL;
+    private SpotLightUL[] m_spotLightsUL;
     private final int invalidUL = -1;
 
     public LightingTechnique(GL3 gl3, String shadersFilepath, String vertexShader, String fragmentShader) {
@@ -57,12 +59,14 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
 
         gNumPointLightsUL = gl3.glGetUniformLocation(getProgramId(), "gNumPointLights");
 
-        m_pointLightsUL = new PointLightsUL[Light.MAX_POINT_LIGHTS];
+        gNumSpotLightsUL = gl3.glGetUniformLocation(getProgramId(), "gNumSpotLights");
+
+        m_pointLightsUL = new PointLightUL[Light.MAX_POINT_LIGHTS];
 
         for (int i = 0; i < Light.MAX_POINT_LIGHTS; i++) {
 
-            m_pointLightsUL[i] = new PointLightsUL();            
-            
+            m_pointLightsUL[i] = new PointLightUL();
+
             m_pointLightsUL[i].color = gl3.glGetUniformLocation(getProgramId(), "gPointLights[" + i + "].Base.Color");
 
             m_pointLightsUL[i].ambientIntensity = gl3.glGetUniformLocation(getProgramId(),
@@ -94,6 +98,52 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
                 error = true;
             }
         }
+        m_spotLightsUL = new SpotLightUL[Light.MAX_SPOT_LIGHTS];
+
+        for (int i = 0; i < Light.MAX_SPOT_LIGHTS; i++) {
+
+            m_spotLightsUL[i] = new SpotLightUL();
+
+            m_spotLightsUL[i].color = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Base.Color");
+
+            m_spotLightsUL[i].ambientIntensity = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Base.AmbientIntensity");
+
+            m_spotLightsUL[i].position = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Position");
+
+            m_spotLightsUL[i].direction = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Direction");
+
+            m_spotLightsUL[i].cutoff = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Cutoff");
+
+            m_spotLightsUL[i].diffuseIntensity = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Base.DiffuseIntensity");
+
+            m_spotLightsUL[i].attenuation.constant = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Atten.Constant");
+
+            m_spotLightsUL[i].attenuation.linear = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Atten.Linear");
+
+            m_spotLightsUL[i].attenuation.exp = gl3.glGetUniformLocation(getProgramId(),
+                    "gSpotLights[" + i + "].Base.Atten.Exp");
+
+            if (m_spotLightsUL[i].color == invalidUL
+                    || m_spotLightsUL[i].ambientIntensity == invalidUL
+                    || m_spotLightsUL[i].position == invalidUL
+                    || m_spotLightsUL[i].direction == invalidUL
+                    || m_spotLightsUL[i].cutoff == invalidUL
+                    || m_spotLightsUL[i].diffuseIntensity == invalidUL
+                    || m_spotLightsUL[i].attenuation.constant == invalidUL
+                    || m_spotLightsUL[i].attenuation.linear == invalidUL
+                    || m_spotLightsUL[i].attenuation.exp == invalidUL) {
+
+                error = true;
+            }
+        }
         if (gWvpUL == invalidUL
                 || gWorldUL == invalidUL
                 || gSamplerUL == invalidUL
@@ -104,7 +154,8 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
                 || gDirLightDiffuseIntensityUL == invalidUL
                 || gMatSpecularIntensityUL == invalidUL
                 || gSpecularPowerUL == invalidUL
-                || gNumPointLightsUL == invalidUL) {
+                || gNumPointLightsUL == invalidUL
+                || gNumSpotLightsUL == invalidUL) {
 
             error = true;
         }
@@ -142,6 +193,27 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
         }
     }
     
+    public void setSpotLights(GL3 gl3, Light.SpotLight[] lights) {
+
+        gl3.glUniform1f(gNumSpotLightsUL, lights.length);
+
+        for (int i = 0; i < lights.length; i++) {
+            
+            gl3.glUniform3f(m_spotLightsUL[i].color, lights[i].color.x, lights[i].color.y, lights[i].color.z);            
+            gl3.glUniform1f(m_spotLightsUL[i].ambientIntensity, lights[i].ambientIntensity);            
+            gl3.glUniform1f(m_spotLightsUL[i].diffuseIntensity, lights[i].diffuseIntensity);            
+            gl3.glUniform3f(m_spotLightsUL[i].position, 
+                    lights[i].position.x, lights[i].position.y, lights[i].position.z);            
+            Vec3 direction = lights[i].direction;
+            direction = direction.normalize();
+            gl3.glUniform3f(m_spotLightsUL[i].direction, direction.x, direction.y, direction.z);            
+            gl3.glUniform1f(m_spotLightsUL[i].cutoff, (float)Math.cos(Math.toRadians(lights[i].cutoff)));            
+            gl3.glUniform1f(m_spotLightsUL[i].attenuation.constant, lights[i].attenuation.constant);            
+            gl3.glUniform1f(m_spotLightsUL[i].attenuation.linear, lights[i].attenuation.linear);            
+            gl3.glUniform1f(m_spotLightsUL[i].attenuation.exp, lights[i].attenuation.exp);
+        }
+    }
+
     public int getgWvpUL() {
         return gWvpUL;
     }
@@ -174,7 +246,7 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
         return gSpecularPowerUL;
     }
 
-    private class PointLightsUL {
+    private class PointLightUL {
 
         public int color;
         public int ambientIntensity;
@@ -182,16 +254,32 @@ public class LightingTechnique extends glsl.GLSLProgramObject {
         public int position;
         public Attenuation attenuation;
 
-        public PointLightsUL() {
-            
+        public PointLightUL() {
+
             attenuation = new Attenuation();
         }
-        
-        private class Attenuation {
+    }
 
-            public int constant;
-            public int linear;
-            public int exp;
+    private class Attenuation {
+
+        public int constant;
+        public int linear;
+        public int exp;
+    }
+
+    private class SpotLightUL {
+
+        public int color;
+        public int ambientIntensity;
+        public int diffuseIntensity;
+        public int position;
+        public int direction;
+        public int cutoff;
+        public Attenuation attenuation;
+        
+        public SpotLightUL() {
+            
+            attenuation = new Attenuation();
         }
     }
 }
