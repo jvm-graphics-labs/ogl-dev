@@ -5,7 +5,7 @@
  */
 package ogldevtutorials.tut05_uniformVariables.glsl;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 
 /**
  *

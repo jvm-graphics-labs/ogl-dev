@@ -3,11 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tut21_spotLight.glsl;
+package ogldevtutorials.tut22_jAssimp.glsl;
 
 import com.jogamp.opengl.GL3;
 import jglm.Vec3;
-import ogldevtutorials.tut21_spotLight.util.Light;
+import ogldevtutorials.tut22_jAssimp.util.Light;
 
 /**
  *

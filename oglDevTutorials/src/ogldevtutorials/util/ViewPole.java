@@ -153,7 +153,7 @@ public class ViewPole implements MouseListener {
         
         Vec3 target = currView.getTargetPos();
         
-        Vec3 offset = new Vec3((float) -difference.x / 100, (float) difference.y / 100, 0f);
+        Vec3 offset = new Vec3((float) -difference.x / 50, (float) difference.y / 50, 0f);
         
         Mat4 worldSpaceOffset = Mat4.translate(offset);
         
@@ -206,5 +206,9 @@ public class ViewPole implements MouseListener {
     public void mouseWheelMoved(MouseEvent me) {
 
         currView.setRadius(currView.getRadius() + me.getRotation()[1] * viewScale.getRadiusDelta());
+    }
+
+    public ViewData getCurrView() {
+        return currView;
     }
 }

@@ -5,7 +5,7 @@
  */
 package ogldevtutorials.tut20_pointLight.glsl;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 import jglm.Vec3;
 import ogldevtutorials.tut20_pointLight.util.Light;
 

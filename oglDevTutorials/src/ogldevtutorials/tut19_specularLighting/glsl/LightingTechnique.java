@@ -5,7 +5,7 @@
  */
 package ogldevtutorials.tut19_specularLighting.glsl;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 import jglm.Vec3;
 import ogldevtutorials.tut19_specularLighting.util.DirectionalLight;
 

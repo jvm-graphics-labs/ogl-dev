@@ -6,8 +6,8 @@
 
 package ogldevtutorials.tut11_concatenatingTransformation.glsl;
 
+import com.jogamp.opengl.GL3;
 import glsl.GLSLProgramObject;
-import javax.media.opengl.GL3;
 
 /**
  *

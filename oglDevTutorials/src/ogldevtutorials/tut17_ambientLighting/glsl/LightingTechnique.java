@@ -5,7 +5,7 @@
  */
 package ogldevtutorials.tut17_ambientLighting.glsl;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 import ogldevtutorials.tut17_ambientLighting.util.DirectionalLight;
 
 /**

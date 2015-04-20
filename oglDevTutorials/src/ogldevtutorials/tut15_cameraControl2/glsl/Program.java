@@ -10,8 +10,8 @@ package ogldevtutorials.tut15_cameraControl2.glsl;
  *
  * @author elect
  */
+import com.jogamp.opengl.GL3;
 import glsl.GLSLProgramObject;
-import javax.media.opengl.GL3;
 
 /**
  *

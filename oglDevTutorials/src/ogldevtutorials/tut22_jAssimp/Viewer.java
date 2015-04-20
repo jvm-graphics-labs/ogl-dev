@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package ogldevtutorials.tut21_spotLight;
+package ogldevtutorials.tut22_jAssimp;
 
 import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
@@ -13,19 +13,20 @@ import com.jogamp.opengl.GLCapabilities;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.GLProfile;
 import com.jogamp.opengl.util.Animator;
-import com.jogamp.opengl.util.GLBuffers;
-import java.nio.FloatBuffer;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import jglm.Jglm;
-import jglm.Mat4;
 import jglm.Quat;
 import jglm.Vec2i;
 import jglm.Vec3;
 import jglm.Vec4;
-import ogldevtutorials.tut21_spotLight.glsl.LightingTechnique;
-import ogldevtutorials.tut21_spotLight.util.KeyListener;
-import ogldevtutorials.tut21_spotLight.util.Light.DirectionalLight;
-import ogldevtutorials.tut21_spotLight.util.Light.PointLight;
-import ogldevtutorials.tut21_spotLight.util.Light.SpotLight;
+import ogldevtutorials.tut22_jAssimp.glsl.LightingTechnique;
+import ogldevtutorials.tut22_jAssimp.util.KeyListener;
+import ogldevtutorials.tut22_jAssimp.util.Light.DirectionalLight;
+import ogldevtutorials.tut22_jAssimp.util.Light.PointLight;
+import ogldevtutorials.tut22_jAssimp.util.Light.SpotLight;
+import ogldevtutorials.tut22_jAssimp.util.Mesh;
 import ogldevtutorials.util.PersProjInfo;
 import ogldevtutorials.util.Pipeline;
 import ogldevtutorials.util.Texture;
@@ -43,7 +44,6 @@ public class Viewer implements GLEventListener {
     private NewtCanvasAWT newtCanvasAWT;
     private int imageWidth;
     private int imageHeight;
-    private int[] objects;
     private LightingTechnique lightingTechnique;
     private DirectionalLight directionalLight;
     private float scale;
@@ -54,6 +54,7 @@ public class Viewer implements GLEventListener {
     private Vec4 cameraPos;
     private Vec2i field;
     private Vec3 targetPos;
+    private Mesh mesh;
 
     public Viewer() {
 
@@ -67,8 +68,6 @@ public class Viewer implements GLEventListener {
         directionalLight = new DirectionalLight(new Vec3(1f, 1f, 1f), 0f, .01f, new Vec3(1f, -1f, 0f));
 
         targetPos = new Vec3(field.x / 2, 0f, field.y / 2);
-//        targetPos = new Vec3(0f, 0f, 0f);
-//        Quat quat = new Quat(0f, 0f, 0f, 1f);
         Quat quat = Jglm.angleAxis(90, new Vec3(1f, 0f, 0f));
         viewPole = new ViewPole(new ViewData(targetPos, quat, 20f), new ViewScale(90f / 250f, 0.2f));
 
@@ -110,9 +109,6 @@ public class Viewer implements GLEventListener {
         gl3.glFrontFace(GL3.GL_CCW);
         gl3.glCullFace(GL3.GL_BACK);
         gl3.glEnable(GL3.GL_CULL_FACE);
-        objects = new int[Objects.size.ordinal()];
-
-        createVertexBuffer(gl3);
 
         lightingTechnique = new LightingTechnique(gl3, "/ogldevtutorials/tut21_spotLight/glsl/shaders/",
                 "lighting_VS.glsl", "lighting_FS.glsl");
@@ -123,32 +119,11 @@ public class Viewer implements GLEventListener {
         }
         lightingTechnique.unbind(gl3);
 
-        texture = new Texture(GL3.GL_TEXTURE_2D, "test.png");
-
-        texture.load(gl3);
-    }
-
-    private void createVertexBuffer(GL3 gl3) {
-
-        Vec3 normal = new Vec3(0f, 1f, 0f);
-
-        float[] vertices = new float[]{
-            0f, 0f, 0f, 0f, 0f, normal.x, normal.y, normal.z,
-            0f, 0f, field.y, 0f, 1f, normal.x, normal.y, normal.z,
-            field.x, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
-            field.x, 0f, 0f, 1f, 0f, normal.x, normal.y, normal.z,
-            0f, 0f, field.y, 0f, 1f, normal.x, normal.y, normal.z,
-            field.x, 0f, field.y, 1f, 1f, normal.x, normal.y, normal.z
-        };
-        gl3.glGenBuffers(1, objects, Objects.vbo.ordinal());
-
-        gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, objects[Objects.vbo.ordinal()]);
-        {
-            FloatBuffer buffer = GLBuffers.newDirectFloatBuffer(vertices);
-
-            gl3.glBufferData(GL3.GL_ARRAY_BUFFER, vertices.length * 4, buffer, GL3.GL_STATIC_DRAW);
+        try {
+            mesh = new Mesh(gl3, "phoenix_ugv.md2");
+        } catch (IOException ex) {
+            Logger.getLogger(Viewer.class.getName()).log(Level.SEVERE, null, ex);
         }
-        gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
     }
 
     @Override
@@ -162,14 +137,12 @@ public class Viewer implements GLEventListener {
 
         GL3 gl3 = glad.getGL().getGL3();
 
-        gl3.glClear(GL3.GL_COLOR_BUFFER_BIT);
+        scale += 0.001f;
 
-        scale += 0.0057f;
-        
+        gl3.glClear(GL3.GL_COLOR_BUFFER_BIT | GL3.GL_DEPTH_BUFFER_BIT);
+
         cameraPos = viewPole.calcMatrix().inverse().mult(new Vec4(0f, 0f, 0f, 1f));
-//        cameraPos.print("cameraPos");
         targetPos = viewPole.getCurrView().getTargetPos();
-//        targetPos.print("targetPos");
 
         lightingTechnique.bind(gl3);
         {
@@ -183,12 +156,12 @@ public class Viewer implements GLEventListener {
             pl[1].position = new Vec3(7f, 1f, (float) (field.y * (Math.sin(scale) + 1f) / 2f));
             pl[1].attenuation.linear = .1f;
             lightingTechnique.setPointLights(gl3, pl);
-            
+
             SpotLight[] sl = new SpotLight[]{new SpotLight(), new SpotLight()};
             sl[0].diffuseIntensity = .9f;
             sl[0].color = new Vec3(0f, 1f, 1f);
             sl[0].position = new Vec3(cameraPos);
-            sl[0].direction = targetPos.minus(new Vec3(cameraPos));
+            sl[0].direction = viewPole.getCurrView().getTargetPos();
             sl[0].attenuation.linear = .1f;
             sl[0].cutoff = 10f;
             sl[1].diffuseIntensity = .9f;
@@ -198,41 +171,18 @@ public class Viewer implements GLEventListener {
             sl[1].attenuation.linear = .1f;
             sl[1].cutoff = 20f;
             lightingTechnique.setSpotLights(gl3, sl);
-
-            Mat4 matrix = pipeline.getWVPTrans();
-            gl3.glUniformMatrix4fv(lightingTechnique.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
-
-            Mat4 worldTransformation = pipeline.getWorldTrans();
-            gl3.glUniformMatrix4fv(lightingTechnique.getgWorldUL(), 1, false, worldTransformation.toFloatArray(), 0);
-
-            lightingTechnique.setDirectionalLight(gl3, directionalLight);
-            
-            gl3.glUniform3f(lightingTechnique.getgEyeWorldPosUL(), cameraPos.x, cameraPos.y, cameraPos.z);
-            gl3.glUniform1f(lightingTechnique.getgMatSpecularIntensityUL(), 0f);
-            gl3.glUniform1f(lightingTechnique.getgSpecularPowerUL(), 0f);
-
-            gl3.glEnableVertexAttribArray(0);
-            gl3.glEnableVertexAttribArray(1);
-            gl3.glEnableVertexAttribArray(2);
-            {
-                gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, objects[Objects.vbo.ordinal()]);
-                {
-                    int size = (3 + 2 + 3) * 4;
-                    gl3.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, size, 0);
-                    gl3.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, size, 3 * 4);
-                    gl3.glVertexAttribPointer(2, 3, GL3.GL_FLOAT, false, size, (3 + 2) * 4);
-
-                    texture.bind(gl3, GL3.GL_TEXTURE0);
-                    {
-                        gl3.glDrawArrays(GL3.GL_TRIANGLES, 0, 6);
-                    }
-                    texture.unbind(gl3, GL3.GL_TEXTURE0);
-                }
-                gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, 0);
-            }
-            gl3.glDisableVertexAttribArray(0);
-            gl3.glDisableVertexAttribArray(1);
-            gl3.glDisableVertexAttribArray(2);
+//
+//            Mat4 matrix = pipeline.getWVPTrans();
+//            gl3.glUniformMatrix4fv(lightingTechnique.getgWvpUL(), 1, false, matrix.toFloatArray(), 0);
+//
+//            Mat4 worldTransformation = pipeline.getWorldTrans();
+//            gl3.glUniformMatrix4fv(lightingTechnique.getgWorldUL(), 1, false, worldTransformation.toFloatArray(), 0);
+//
+//            lightingTechnique.setDirectionalLight(gl3, directionalLight);
+//            
+//            gl3.glUniform3f(lightingTechnique.getgEyeWorldPosUL(), cameraPos.x, cameraPos.y, cameraPos.z);
+//            gl3.glUniform1f(lightingTechnique.getgMatSpecularIntensityUL(), 0f);
+//            gl3.glUniform1f(lightingTechnique.getgSpecularPowerUL(), 0f);
         }
         lightingTechnique.unbind(gl3);
     }
@@ -263,11 +213,5 @@ public class Viewer implements GLEventListener {
 
     public DirectionalLight getDirectionalLight() {
         return directionalLight;
-    }
-
-    private enum Objects {
-
-        vbo,
-        size
     }
 }

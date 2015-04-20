@@ -5,6 +5,7 @@
  */
 package ogldevtutorials.util;
 
+import com.jogamp.opengl.GL3;
 import com.jogamp.opengl.util.texture.TextureData;
 import com.jogamp.opengl.util.texture.TextureIO;
 import java.io.File;
@@ -13,7 +14,6 @@ import java.net.URL;
 import java.nio.Buffer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.media.opengl.GL3;
 
 /**
  *

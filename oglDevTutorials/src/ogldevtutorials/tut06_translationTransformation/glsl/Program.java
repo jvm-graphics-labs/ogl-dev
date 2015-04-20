@@ -5,7 +5,7 @@
  */
 package ogldevtutorials.tut06_translationTransformation.glsl;
 
-import javax.media.opengl.GL3;
+import com.jogamp.opengl.GL3;
 
 /**
  *
