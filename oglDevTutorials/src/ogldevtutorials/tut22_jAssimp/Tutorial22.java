@@ -15,6 +15,8 @@ import java.awt.event.WindowEvent;
  */
 public class Tutorial22 {
     
+    public static Viewer instance;
+    
     public static void main(String[] args) {
 
         final Viewer viewer = new Viewer();
@@ -40,6 +42,4 @@ public class Tutorial22 {
         });
         frame.setVisible(true);
     }
-
-    public static Viewer instance;
 }

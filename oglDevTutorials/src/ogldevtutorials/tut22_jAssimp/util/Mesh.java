@@ -50,23 +50,19 @@ public class Mesh {
         gl3.glEnableVertexAttribArray(1);
         gl3.glEnableVertexAttribArray(2);
 
-        for (int i = 0; i < m_Entries.length; i++) {
-
-            gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, m_Entries[i].buffers[Buffers.vertices.ordinal()]);
-
+        for (MeshEntry m_Entry : m_Entries) {
+            
+            gl3.glBindBuffer(GL3.GL_ARRAY_BUFFER, m_Entry.buffers[Buffers.vertices.ordinal()]);
             gl3.glVertexAttribPointer(0, 3, GL3.GL_FLOAT, false, Vertex.size, 0);
             gl3.glVertexAttribPointer(1, 2, GL3.GL_FLOAT, false, Vertex.size, 3 * GLBuffers.SIZEOF_FLOAT);
             gl3.glVertexAttribPointer(2, 3, GL3.GL_FLOAT, false, Vertex.size, (3 + 2) * GLBuffers.SIZEOF_FLOAT);
-
-            gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, m_Entries[i].buffers[Buffers.indices.ordinal()]);
-
-            int materialIndex = m_Entries[i].materialIndex;
-
+            gl3.glBindBuffer(GL3.GL_ELEMENT_ARRAY_BUFFER, m_Entry.buffers[Buffers.indices.ordinal()]);
+            int materialIndex = m_Entry.materialIndex;
             if (materialIndex < m_Textures.length && m_Textures[materialIndex] != null) {
-                
+
                 m_Textures[materialIndex].bind(gl3, GL3.GL_TEXTURE0);
             }
-            gl3.glDrawElements(GL3.GL_TRIANGLES, m_Entries[i].numIndices, GL3.GL_UNSIGNED_INT, 0);
+            gl3.glDrawElements(GL3.GL_TRIANGLES, m_Entry.numIndices, GL3.GL_UNSIGNED_INT, 0);
         }
         gl3.glDisableVertexAttribArray(0);
         gl3.glDisableVertexAttribArray(1);
@@ -136,6 +132,10 @@ public class Mesh {
 
                     m_Textures[i].load(gl3);
                 }
+            }
+            if (m_Textures == null) {
+
+                m_Textures[i] = new Texture(GL3.GL_TEXTURE_2D, "/white.png");
             }
         }
     }
