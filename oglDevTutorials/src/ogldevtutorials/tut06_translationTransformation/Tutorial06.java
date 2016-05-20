@@ -62,7 +62,7 @@ public class Tutorial06 implements GLEventListener {
         glWindow.setFullscreen(false);
         glWindow.setPointerVisible(true);
         glWindow.confinePointer(false);
-        glWindow.setTitle("Tutorial 05 - Translation Transformation");
+        glWindow.setTitle("Tutorial 06 - Translation Transformation");
         glWindow.setContextCreationFlags(GLContext.CTX_OPTION_DEBUG);
         glWindow.setVisible(true);
 
