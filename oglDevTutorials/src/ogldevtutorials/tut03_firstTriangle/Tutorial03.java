@@ -47,13 +47,13 @@ public class Tutorial03 implements GLEventListener {
         glWindow = GLWindow.create(screen, glCapabilities);
 
         glWindow.setSize(1034, 768);
-        glWindow.setPosition(100, 100);
+        glWindow.setPosition(100, 50);
         glWindow.setUndecorated(false);
         glWindow.setAlwaysOnTop(false);
         glWindow.setFullscreen(false);
         glWindow.setPointerVisible(true);
         glWindow.confinePointer(false);
-        glWindow.setTitle("Tutorial 03");
+        glWindow.setTitle("Tutorial 03 - First triangle");
         glWindow.setContextCreationFlags(GLContext.CTX_OPTION_DEBUG);
         glWindow.setVisible(true);
 
@@ -121,6 +121,7 @@ public class Tutorial03 implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         
         BufferUtils.destroyDirectBuffer(clearColor);
+        BufferUtils.destroyDirectBuffer(vbo);
         
         System.exit(0);
     }

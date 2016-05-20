@@ -8,12 +8,12 @@ package ogldevtutorials.tut04_shaders;
 import com.jogamp.newt.Display;
 import com.jogamp.newt.NewtFactory;
 import com.jogamp.newt.Screen;
-import com.jogamp.newt.awt.NewtCanvasAWT;
 import com.jogamp.newt.opengl.GLWindow;
 import static com.jogamp.opengl.GL.GL_ARRAY_BUFFER;
 import static com.jogamp.opengl.GL.GL_FLOAT;
 import static com.jogamp.opengl.GL.GL_STATIC_DRAW;
 import static com.jogamp.opengl.GL.GL_TRIANGLES;
+import static com.jogamp.opengl.GL.GL_VERSION;
 import static com.jogamp.opengl.GL2ES2.GL_FRAGMENT_SHADER;
 import static com.jogamp.opengl.GL2ES2.GL_VERTEX_SHADER;
 import static com.jogamp.opengl.GL2ES3.GL_COLOR;
@@ -54,13 +54,13 @@ public class Tutorial04 implements GLEventListener {
         glWindow = GLWindow.create(screen, glCapabilities);
 
         glWindow.setSize(1044, 768);
-        glWindow.setPosition(100, 100);
+        glWindow.setPosition(100, 50);
         glWindow.setUndecorated(false);
         glWindow.setAlwaysOnTop(false);
         glWindow.setFullscreen(false);
         glWindow.setPointerVisible(true);
         glWindow.confinePointer(false);
-        glWindow.setTitle("Tutorial 04");
+        glWindow.setTitle("Tutorial 04 - Shaders");
         glWindow.setContextCreationFlags(GLContext.CTX_OPTION_DEBUG);
         glWindow.setVisible(true);
 
@@ -78,6 +78,8 @@ public class Tutorial04 implements GLEventListener {
     public void init(GLAutoDrawable drawable) {
 
         GL3 gl3 = drawable.getGL().getGL3();
+
+        System.out.println("GL version: " + gl3.glGetString(GL_VERSION));
 
         clearColor.put(0, 0.0f).put(1, 0.0f).put(2, 0.0f).put(3, 0.0f);
 
@@ -146,9 +148,10 @@ public class Tutorial04 implements GLEventListener {
 
     @Override
     public void dispose(GLAutoDrawable drawable) {
-        
+
         BufferUtils.destroyDirectBuffer(clearColor);
-        
+        BufferUtils.destroyDirectBuffer(vbo);
+
         System.exit(0);
     }
 }

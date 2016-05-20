@@ -39,13 +39,13 @@ public class Tutorial01 implements GLEventListener {
         glWindow = GLWindow.create(screen, glCapabilities);
 
         glWindow.setSize(1024, 768);
-        glWindow.setPosition(100, 100);
+        glWindow.setPosition(100, 50);
         glWindow.setUndecorated(false);
         glWindow.setAlwaysOnTop(false);
         glWindow.setFullscreen(false);
         glWindow.setPointerVisible(true);
         glWindow.confinePointer(false);
-        glWindow.setTitle("Tutorial 01");
+        glWindow.setTitle("Tutorial 01 - Open a window");
         glWindow.setContextCreationFlags(GLContext.CTX_OPTION_DEBUG);
         glWindow.setVisible(true);
 

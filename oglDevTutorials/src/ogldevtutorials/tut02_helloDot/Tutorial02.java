@@ -47,13 +47,13 @@ public class Tutorial02 implements GLEventListener {
         glWindow = GLWindow.create(screen, glCapabilities);
 
         glWindow.setSize(1024, 768);
-        glWindow.setPosition(100, 100);
+        glWindow.setPosition(100, 50);
         glWindow.setUndecorated(false);
         glWindow.setAlwaysOnTop(false);
         glWindow.setFullscreen(false);
         glWindow.setPointerVisible(true);
         glWindow.confinePointer(false);
-        glWindow.setTitle("Tutorial 02");
+        glWindow.setTitle("Tutorial 02 -  Hello Dot");
         glWindow.setContextCreationFlags(GLContext.CTX_OPTION_DEBUG);
         glWindow.setVisible(true);
 
@@ -72,7 +72,7 @@ public class Tutorial02 implements GLEventListener {
 
         GL3 gl3 = drawable.getGL().getGL3();
         // different from black otherwise you won't distinguish the black point
-        clearColor.put(0, 1.0f).put(1, 0.5f).put(2, 0.0f).put(3, 1.0f);
+        clearColor.put(0, 1.0f).put(1, 1.0f).put(2, 1.0f).put(3, 1.0f);
 
         createVertexBuffer(gl3);
     }
@@ -115,6 +115,7 @@ public class Tutorial02 implements GLEventListener {
     public void dispose(GLAutoDrawable drawable) {
         
         BufferUtils.destroyDirectBuffer(clearColor);
+        BufferUtils.destroyDirectBuffer(vbo);
         
         System.exit(0);
     }
