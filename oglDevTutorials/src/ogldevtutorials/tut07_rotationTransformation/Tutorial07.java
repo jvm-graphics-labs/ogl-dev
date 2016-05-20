@@ -77,8 +77,6 @@ public class Tutorial07 implements GLEventListener {
     private int worldLocation;
     private float scale = 0.0f;
 
-    
-
     @Override
     public void init(GLAutoDrawable drawable) {
 
@@ -144,7 +142,7 @@ public class Tutorial07 implements GLEventListener {
         scale += 0.001f;
 
         Mat4 world = new Mat4();
-        
+
         world.m00 = (float) Math.cos(scale); world.m01 = -(float) Math.sin(scale); world.m02 = 0.0f; world.m03 = 0.0f;
         world.m10 = (float) Math.sin(scale); world.m11 = (float) Math.cos(scale); world.m12 = 0.0f; world.m13 = 0.0f;
         world.m20 = 0.0f; world.m21 = 0.0f; world.m22 = 1.0f; world.m23= 0.0f;
