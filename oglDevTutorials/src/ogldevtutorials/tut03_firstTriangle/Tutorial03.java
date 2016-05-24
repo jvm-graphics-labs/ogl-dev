@@ -120,6 +120,10 @@ public class Tutorial03 implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
         
+        GL3 gl3 = drawable.getGL().getGL3();
+        
+        gl3.glDeleteBuffers(1, vbo);
+        
         BufferUtils.destroyDirectBuffer(clearColor);
         BufferUtils.destroyDirectBuffer(vbo);
         

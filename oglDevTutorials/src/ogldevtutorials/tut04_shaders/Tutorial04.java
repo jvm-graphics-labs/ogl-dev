@@ -73,6 +73,7 @@ public class Tutorial04 implements GLEventListener {
 
     private FloatBuffer clearColor = GLBuffers.newDirectFloatBuffer(4);
     private IntBuffer vbo = GLBuffers.newDirectIntBuffer(1);
+    private int programName;
 
     @Override
     public void init(GLAutoDrawable drawable) {
@@ -121,9 +122,9 @@ public class Tutorial04 implements GLEventListener {
 
         program.link(gl3, System.out);
 
-        int shaderProgram = program.program();
+        programName = program.program();
 
-        gl3.glUseProgram(shaderProgram);
+        gl3.glUseProgram(programName);
     }
 
     @Override
@@ -149,6 +150,11 @@ public class Tutorial04 implements GLEventListener {
     @Override
     public void dispose(GLAutoDrawable drawable) {
 
+        GL3 gl3 = drawable.getGL().getGL3();
+        
+        gl3.glDeleteBuffers(1, vbo);
+        gl3.glDeleteProgram(programName);
+        
         BufferUtils.destroyDirectBuffer(clearColor);
         BufferUtils.destroyDirectBuffer(vbo);
 

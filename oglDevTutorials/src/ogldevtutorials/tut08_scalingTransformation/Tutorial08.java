@@ -27,6 +27,7 @@ import com.jogamp.opengl.util.Animator;
 import com.jogamp.opengl.util.GLBuffers;
 import com.jogamp.opengl.util.glsl.ShaderCode;
 import com.jogamp.opengl.util.glsl.ShaderProgram;
+import glm.mat._4.Mat4;
 import glm.vec._3.Vec3;
 import glutil.BufferUtils;
 import java.nio.ByteBuffer;
@@ -140,7 +141,7 @@ public class Tutorial08 implements GLEventListener {
 
         scale += 0.001f;
 
-        glm.mat._4.Mat4 world = new glm.mat._4.Mat4();
+        Mat4 world = new Mat4();
 
         world.m00 = (float) Math.sin(scale); world.m01 = 0.0f; world.m02 = 0.0f; world.m03 = 0.0f;
         world.m10 = 0.0f; world.m11 = (float) Math.sin(scale); world.m12 = 0.0f; world.m13 = 0.0f;
