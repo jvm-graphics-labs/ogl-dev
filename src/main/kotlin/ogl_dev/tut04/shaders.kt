@@ -1,8 +1,13 @@
-package ogl_dev.tut02
+package ogl_dev.tut04
+
+/**
+ * Created by elect on 23/04/2017.
+ */
 
 import glm.vec._2.Vec2i
 import glm.vec._3.Vec3
 import ogl_dev.GlfwWindow
+import ogl_dev.common.readFile
 import ogl_dev.glfw
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.*
@@ -14,10 +19,6 @@ import uno.glf.semantic
 import uno.gln.glBindBuffer
 import uno.gln.glDrawArrays
 import kotlin.properties.Delegates
-
-/**
- * Created by elect on 22/04/17.
- */
 
 private var window by Delegates.notNull<GlfwWindow>()
 
@@ -31,7 +32,7 @@ fun main(args: Array<String>) {
         windowHint { doubleBuffer = true } // Configure GLFW
     }
 
-    window = GlfwWindow(300, "Tutorial 2") // Create the window
+    window = GlfwWindow(300, "Tutorial 4") // Create the window
 
     with(window) {
         pos = Vec2i(100) // Set the window position
@@ -44,9 +45,13 @@ fun main(args: Array<String>) {
     makes the OpenGL bindings available for use.    */
     GL.createCapabilities()
 
+    println("GL version: ${glGetString(GL_VERSION)}")
+
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f)
 
     createVertexBuffer()
+
+    compileShaders()
 
     // Run the rendering loop until the user has attempted to close the window or has pressed the ESCAPE key.
     while (!window.shouldClose) {
@@ -61,15 +66,62 @@ fun main(args: Array<String>) {
 }
 
 val vbo = intBufferBig(1)
+val vsFileName = "tut04/shader.vert"
+val fsFileName = "tut04/shader.frag"
 
-fun createVertexBuffer(){
+fun createVertexBuffer() {
 
-    val vertices = floatBufferBig(Vec3.SIZE)
-    Vec3(0.0f, 0.0f, 0.0f) to vertices
+    val vertices = floatBufferBig(Vec3.SIZE * 3)
+    Vec3(-1.0f, -1.0f, 0.0f) to vertices
+    Vec3(1.0f, -1.0f, 0.0f).to(vertices, Vec3.length)
+    Vec3(0.0f, 1.0f, 0.0f).to(vertices, Vec3.length * 2)
 
     glGenBuffers(vbo)
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
     glBufferData(GL_ARRAY_BUFFER, vertices, GL_STATIC_DRAW)
+}
+
+fun compileShaders() {
+
+    val shaderProgram = glCreateProgram()
+
+    if (shaderProgram == 0) throw Error("Error creating shader program")
+
+    val vs = readFile(vsFileName)
+    val fs = readFile(fsFileName)
+
+    addShader(shaderProgram, vs, GL_VERTEX_SHADER)
+    addShader(shaderProgram, fs, GL_FRAGMENT_SHADER)
+
+    glLinkProgram(shaderProgram)
+    if (glGetProgrami(shaderProgram, GL_LINK_STATUS) == GL_FALSE) {
+        val errorLog = glGetProgramInfoLog(shaderProgram)
+        throw Error("Error linking shader program: $errorLog")
+    }
+
+    glValidateProgram(shaderProgram)
+    if (glGetProgrami(shaderProgram, GL_VALIDATE_STATUS) != GL_TRUE) {
+        val errorLog = glGetProgramInfoLog(shaderProgram)
+        throw Error("Invalid shader program: $errorLog")
+    }
+
+    glUseProgram(shaderProgram)
+}
+
+fun addShader(shaderProgram: Int, shaderText: String, shaderType: Int) {
+
+    val shaderObj = glCreateShader(shaderType)
+
+    if (shaderObj == 0) throw Error("Error creating shader type $shaderType")
+
+    glShaderSource(shaderObj, shaderText)
+    glCompileShader(shaderObj)
+
+    if (glGetShaderi(shaderObj, GL_COMPILE_STATUS) != GL_TRUE) {
+        val infoLog = glGetShaderInfoLog(shaderObj)
+        throw Error("Error compiling shader type $shaderType: $infoLog")
+    }
+    glAttachShader(shaderProgram, shaderObj)
 }
 
 fun renderScene() {
@@ -80,7 +132,7 @@ fun renderScene() {
     glBindBuffer(GL_ARRAY_BUFFER, vbo)
     glVertexAttribPointer(semantic.attr.POSITION, Vec3.length, GL_FLOAT, false, Vec3.SIZE, 0)
 
-    glDrawArrays(GL_POINTS, 1)
+    glDrawArrays(GL_TRIANGLES, 3)
 
     glDisableVertexAttribArray(semantic.attr.POSITION)
 

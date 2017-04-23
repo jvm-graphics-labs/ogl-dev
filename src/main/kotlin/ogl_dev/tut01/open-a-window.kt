@@ -1,7 +1,7 @@
 package ogl_dev.tut01
 
 import glm.vec._2.Vec2i
-import ogl_dev.Window
+import ogl_dev.GlfwWindow
 import ogl_dev.glfw
 import org.lwjgl.opengl.GL
 import org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT
@@ -13,7 +13,7 @@ import kotlin.properties.Delegates
  * Created by elect on 22/04/17.
  */
 
-private var window by Delegates.notNull<Window>()
+private var window by Delegates.notNull<GlfwWindow>()
 
 fun main(args: Array<String>) {
 
@@ -25,7 +25,7 @@ fun main(args: Array<String>) {
         windowHint { doubleBuffer = true } // Configure GLFW
     }
 
-    window = Window(300, "Tutorial 01") // Create the window
+    window = GlfwWindow(300, "Tutorial 01") // Create the window
 
     with(window) {
         pos = Vec2i(100) // Set the window position

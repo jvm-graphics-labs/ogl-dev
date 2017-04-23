@@ -116,7 +116,7 @@ object WindowHint {
 }
 
 
-class Window(width: Int, height: Int, title: String) {
+class GlfwWindow(width: Int, height: Int, title: String) {
 
     constructor(windowSize: Vec2i, title: String) : this(windowSize.x, windowSize.y, title)
     constructor(x: Int, title: String) : this(x, x, title)
